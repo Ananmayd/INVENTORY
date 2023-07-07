@@ -1,0 +1,80 @@
+.home {
+  background: linear-gradient(to right, #23abab, #5d11df);
+    min-height: 100vh;
+  
+    & nav {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+      color: #fff;
+      & > .logo {
+        color: #fff;
+      }
+    }
+  }
+  .home-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & li a {
+      color: #fff;
+    }
+    & > * {
+      margin-left: 1rem;
+      color: #fff;
+    }
+  }
+  
+  .hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .hero-text {
+    width: 52%;
+    & > * {
+      color: #fff;
+      margin-bottom: 0rem;
+    }
+    & > h1 span {
+      display: flex;
+      padding: 5px;
+      line-height: 6.3px;
+      font-size: 5rem;
+    }
+    & > p{
+      font-size: 2.5rem;
+    }
+    top: 120px;
+    position: relative;
+  }
+  .hero-image {
+    top: 200px;
+    width: 24%;
+    position: relative;
+    display: flex;
+  }
+  @media screen and (max-width: 600px) {
+    .hero {
+      flex-direction: column;
+      // left: 10px;
+    }
+  
+    .hero-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      width: 100%;
+      margin: auto;
+      text-align: center;
+    }
+    .hero-image {
+      width: 100%;
+      &img {
+        display: flex;
+        flex-direction: column;
+      };
+      // text-align: center;
+    }
+  }
