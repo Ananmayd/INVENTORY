@@ -6,8 +6,10 @@ const errorHandler = (err, req, res, next) => {
     res.json(
         {
             message: err.message,
-            stack: ProcessingInstruction.env.NODE_ENV === "development" ? err.stack : null
-        })
+            stack: process.env.NODE_ENV === "development" ? err.stack : null
+        });
+
+        // next();
 };
 
 module.exports = errorHandler;

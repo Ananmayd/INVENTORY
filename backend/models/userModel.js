@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const bcrpt = require("bcryptjs")
+const bcrypt = require("bcryptjs")
 
 const userSchema = mongoose.Schema({
     name: {
@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema({
     },
     photo: {
         type: String,
-        required: [true, "Please add a photo"],
+        // required: [true, "Please add a photo"],
         default: "https://i.ibb.co/4pDNDk1/avatar.png"
     },
     phone: {

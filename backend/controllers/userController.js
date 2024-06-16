@@ -32,17 +32,6 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("Email already registered")
     }
 
-    //Generate token
-    const token = generateToken(user._id)
-
-    //Send HTTP-only cookie
-    res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 86400), //1 day
-        sameSite: "none",
-        secure: true,
-    })
 
     //Create new user in our database
     const user = await User.create({
@@ -52,8 +41,20 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
     if (user) {
-        const { _id, name, email, photo, phone, bio } = user
-        res.status(201).json({
+        //Generate token
+        const token = generateToken(user._id)
+
+        //Send HTTP-only cookie
+        res.cookie("token", token, {
+            path: "/",
+            httpOnly: true,
+            expires: new Date(Date.now() + 1000 * 86400), //1 day
+            sameSite: "none",
+            secure: true,
+        })
+        const { _id, name, email, photo, phone, bio } = user;
+
+        return res.status(201).json({
             _id, name, email, photo, phone, bio, token,
         })
     } else {
@@ -107,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //Logout User
-const logout = asyncHandler(async(req, res) => {
+const logout = asyncHandler(async (req, res) => {
     res.cookie("token", "", {
         path: "/",
         httpOnly: true,
@@ -115,41 +116,41 @@ const logout = asyncHandler(async(req, res) => {
         sameSite: "none",
         secure: true,
     });
-    return res.status(200).json({ message: "Logged out successfully"});
+    return res.status(200).json({ message: "Logged out successfully" });
 });
 
 //Get user data
-const getUser = asyncHandler(async(req, res) => {
-   const user = await User.findById(req.user._id)
+const getUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id)
 
-   if (user) {
-    const { _id, name, email, photo, phone, bio } = user;
-    res.status(200).json({
-        _id, name, email, photo, phone, bio,
-    })
-} else{
-    res.status(400);
-    throw new Error("User not found")
-}
+    if (user) {
+        const { _id, name, email, photo, phone, bio } = user;
+        res.status(200).json({
+            _id, name, email, photo, phone, bio,
+        })
+    } else {
+        res.status(400);
+        throw new Error("User not found")
+    }
 });
 
 //Get login status
-const loginStatus = asyncHandler(async(req, res) => {
+const loginStatus = asyncHandler(async (req, res) => {
     const token = req.cookies.token;
-    if(!token){
+    if (!token) {
         return res.json(false);
     }
 
     //Verify token
     const verified = jwt.verify(token, process.env.JWT_SECRET)
-    if(verified){
+    if (verified) {
         return res.json(true);
     }
     return res.json(false);
 });
 
 //Update user
-const updateUser = asyncHandler(async(req, res) => {
+const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -169,24 +170,24 @@ const updateUser = asyncHandler(async(req, res) => {
             phone: updatedUser.phone,
             bio: updatedUser.bio,
         })
-    } else{
+    } else {
         res.status(404)
         throw new Error("User not found")
     }
 });
 
 //Change Password
-const changePassword = asyncHandler(async(req, res) => {
+const changePassword = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
-    const { oldPassword, password}= req.body
+    const { oldPassword, password } = req.body
 
-    if(!user){
+    if (!user) {
         res.status(400);
         throw new Error("User not found, please signup");
     }
     //Validate
-    if(!oldPassword || !password){
+    if (!oldPassword || !password) {
         res.status(400);
         throw new Error("Please add old and new password");
     }
@@ -195,11 +196,11 @@ const changePassword = asyncHandler(async(req, res) => {
     const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password)
 
     // save new password
-    if(user && passwordIsCorrect){
+    if (user && passwordIsCorrect) {
         user.password = password
         await user.save()
         res.status(200).send("Password changed successfully")
-    } else{
+    } else {
         res.status(400);
         throw new Error("Old password is not correct");
     }
@@ -207,41 +208,41 @@ const changePassword = asyncHandler(async(req, res) => {
 });
 
 //Forgot Password
-const forgotPassword = asyncHandler(async(req, res) => {
-   const {email} = req.body
-   const user = await User.findOne({email})
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body
+    const user = await User.findOne({ email })
 
-   if(!user){
-    res.status(404);
-    throw new Error("User does not exist");
-   } 
+    if (!user) {
+        res.status(404);
+        throw new Error("User does not exist");
+    }
 
-   //Delete token if it exist
-   let token = await Token.findOne({userId: user._id})
-   if(token){
-    await token.deleteOne()
-   }
+    //Delete token if it exist
+    let token = await Token.findOne({ userId: user._id })
+    if (token) {
+        await token.deleteOne()
+    }
 
-   // Create Reset token
-   let resetToken = crypto.randomBytes(32).toString("hex") + user._id
-   
+    // Create Reset token
+    let resetToken = crypto.randomBytes(32).toString("hex") + user._id
 
-   //Hash token before saving to DB
-   const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
 
-   //Save token to DB
-   await new Token ({
-    userId: user._id,
-    token: hashedToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 30 * (60 * 1000) //30 min
-   }).save()
+    //Hash token before saving to DB
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
 
-   //construct reset URL
-   const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`
+    //Save token to DB
+    await new Token({
+        userId: user._id,
+        token: hashedToken,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 30 * (60 * 1000) //30 min
+    }).save()
 
-   //Reset email
-   const message = `
+    //construct reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`
+
+    //Reset email
+    const message = `
    <h2>Hello ${user.name}</h2>
    <p>Please use the url below to reset your password.</p>
    <p>This link is valid for 30 minutes only.</p>
@@ -252,46 +253,46 @@ const forgotPassword = asyncHandler(async(req, res) => {
    <p>Ananmay </p>
    `;
 
-   const subject = "Password reset Request"
-   const send_to = user.email
-   const sent_from = precess.env.EMAIL_USER
+    const subject = "Password reset Request"
+    const send_to = user.email
+    const sent_from = precess.env.EMAIL_USER
 
-   try{
-     await sendEmail(subject, message, send_to, sent_from)
-     res.status(200).json({success: true, message: "Reset email sent to the given email"})
-   } catch(err){
-     res.status(500)
-     throw new Error("Email not sent. Please try again")
-   }
+    try {
+        await sendEmail(subject, message, send_to, sent_from)
+        res.status(200).json({ success: true, message: "Reset email sent to the given email" })
+    } catch (err) {
+        res.status(500)
+        throw new Error("Email not sent. Please try again")
+    }
 
 });
 
 //Resset password
-const resetPassword =asyncHandler(async(req, res) => {
-   const {password} = req.body
-   const {resetToken} = req.params
+const resetPassword = asyncHandler(async (req, res) => {
+    const { password } = req.body
+    const { resetToken } = req.params
 
-   //Hash token, then compare to that one in the DB
-   const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
+    //Hash token, then compare to that one in the DB
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
 
-   //Find token in DB
-   const userToken = await Token.findOne({
-    token: hashedToken,
-    expiresAt: {$gt: Date.now()}
-   })
+    //Find token in DB
+    const userToken = await Token.findOne({
+        token: hashedToken,
+        expiresAt: { $gt: Date.now() }
+    })
 
-   if(!userToken){
-      res.status(404);
-      throw new Error("Invalid or Expired token");
-   }
+    if (!userToken) {
+        res.status(404);
+        throw new Error("Invalid or Expired token");
+    }
 
-   //Find user
-   const user = await User.findOne({_id: userToken.userId})
-   user.password = password
-   await user.save()
-   res.status(200).json({
-    message: "Password Reset Successful. Please login."
-   });
+    //Find user
+    const user = await User.findOne({ _id: userToken.userId })
+    user.password = password
+    await user.save()
+    res.status(200).json({
+        message: "Password Reset Successful. Please login."
+    });
 
 });
 

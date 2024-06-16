@@ -3,7 +3,14 @@ const Product = require("../models/productModel");
 const { fileSizeFormatter } = require("../utils/fileUpload");
 const cloudinary = require("cloudinary").v2;
 
-// Create Prouct
+cloudinary.config({
+  cloud_name: "inventoryy",
+  api_key: "496561586322988",
+  api_secret: "5SKB-0zgxHaYjbCS-Ef0QXGXF6c" // Click 'View Credentials' below to copy your API secret
+});
+
+
+// Create Product
 const createProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
 
@@ -20,8 +27,8 @@ const createProduct = asyncHandler(async (req, res) => {
     let uploadedFile;
     try {
       uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-        folder: "Pinvent App",
-        resource_type: "image",
+        asset_folder: 'Inventory',
+        resource_type: 'image'
       });
     } catch (error) {
       res.status(500);
@@ -115,8 +122,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     let uploadedFile;
     try {
       uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-        folder: "Pinvent App",
-        resource_type: "image",
+        asset_folder: 'Inventory',
+        resource_type: 'image'
       });
     } catch (error) {
       res.status(500);
