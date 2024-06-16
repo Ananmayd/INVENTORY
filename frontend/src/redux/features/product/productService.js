@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = "https://inventory-ten-iota.vercel.app/";
+const BACKEND_URL = "https://inventory-ten-iota.vercel.app";
 
 const API_URL = `${BACKEND_URL}/api/products/`;
 

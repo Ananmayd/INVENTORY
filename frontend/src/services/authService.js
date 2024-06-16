@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export const BACKEND_URL = "https://inventory-ten-iota.vercel.app/";
+export const BACKEND_URL = "https://inventory-ten-iota.vercel.app";
 
 export const validateEmail = (email) => {
   return email.match(
