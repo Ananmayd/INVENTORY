@@ -239,7 +239,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }).save()
 
     //construct reset URL
-    const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`
+    const resetUrl = `https://inventory-13sz.vercel.app/resetpassword/${resetToken}`
 
     //Reset email
     const message = `
