@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended: false}));   //handle data comes using url
 app.use(bodyParser.json());
 app.use(cors({
-    origin:'https://inventory-13sz.vercel.app/', 
+    origin:'http://localhost:3000', 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }));
